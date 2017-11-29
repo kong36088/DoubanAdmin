@@ -22,7 +22,7 @@ $('.dislike-group-topic').on('click', function () {
         // Your code.
         var url = encodeURIComponent($(this).data('url'));
         
-        $.get('/admin/douban/dislike?url='+url,function(result){
+        $.get('/douban/dislike?url='+url,function(result){
             if(result == '1'){
                 toastr.success('操作成功！');
                 $.pjax.reload('#pjax-container');
@@ -38,7 +38,7 @@ $('.star-group-topic').on('click', function () {
     // Your code.
     var url = encodeURIComponent($(this).data('url'));    
     
-    $.get('/admin/douban/star?star=1&url='+url,function(result){
+    $.get('/douban/star?star=1&url='+url,function(result){
         if(result == '1'){
             //alert('标记成功！');
             toastr.success('操作成功！');
@@ -55,7 +55,7 @@ $('.unstar-group-topic').on('click', function () {
     // Your code.
     var url = encodeURIComponent($(this).data('url'));    
     
-    $.get('/admin/douban/star?star=0&url='+url,function(result){
+    $.get('/douban/star?star=0&url='+url,function(result){
         if(result == '1'){
             //alert('标记成功！');
             toastr.success('操作成功！');

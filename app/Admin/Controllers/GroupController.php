@@ -100,7 +100,7 @@ class GroupController extends Controller
 
             $grid->column('url','#')->display(function ($url) {
                 $url = urlencode($url);
-                return "<a href=/admin/douban/detail?url={$url}><i class='fa fa-desktop'></i>查看</a>";
+                return "<a href=/douban/detail?url={$url}><i class='fa fa-desktop'></i>查看</a>";
             });
 
 
