@@ -33,6 +33,20 @@ class GroupController extends Controller
         });
     }
 
+    public function showDetail(Request $request)
+    {
+        return Admin::content(function (Content $content) use ($request) {
+            $url = $request->input('url');
+
+            $info = Group::where('url', $url)->first();
+
+            $content->header('帖子内容');
+            $content->description('正在查看豆瓣帖子，标题：' . $info->title);
+
+            $content->body(view('GroupTopicDetail', ['info'=>$info]));
+        });
+    }
+
     /**
      * Edit interface.
      *
@@ -74,11 +88,13 @@ class GroupController extends Controller
     protected function grid()
     {
         return Admin::grid(Group::class, function (Grid $grid) {
-            $grid->model()->where('dislike', '!=', 1);
+            $grid->model()->where('dislike', '!=', 1)->orderBy('last_reply_time', 'desc');
 
-            $grid->column('#')->display(function () {
-                return "";
+            $grid->column('url','#')->display(function ($url) {
+                $url = urlencode($url);
+                return "<a href=/admin/douban/detail?url={$url}><i class='fa fa-desktop'></i>查看</a>";
             });
+
 
             $grid->column('title', '标题');
 

@@ -74,11 +74,13 @@ class GroupStarController extends Controller
     protected function grid()
     {
         return Admin::grid(Group::class, function (Grid $grid) {
-            $grid->model()->where('dislike', '!=', 1)->where('star', '=', 1);
+            $grid->model()->where('dislike', '!=', 1)->where('star', '=', 1)->orderBy('last_reply_time', 'desc');
 
-            $grid->column('#')->display(function () {
-                return "";
+            $grid->column('url','#')->display(function ($url) {
+                $url = urlencode($url);
+                return "<a href=/admin/douban/detail?url={$url}><i class='fa fa-desktop'></i>查看</a>";
             });
+
 
             $grid->column('title', '标题');
 
