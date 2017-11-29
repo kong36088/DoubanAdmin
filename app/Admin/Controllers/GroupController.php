@@ -12,6 +12,7 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class GroupController extends Controller
 {
@@ -38,10 +39,17 @@ class GroupController extends Controller
         return Admin::content(function (Content $content) use ($request) {
             $url = $request->input('url');
 
+            /** @var Collection $info */
             $info = Group::where('url', $url)->first();
 
             $content->header('帖子内容');
+            if(empty($info)){
+                return;
+            }
+
             $content->description('正在查看豆瓣帖子，标题：' . $info->title);
+
+
 
             $content->body(view('GroupTopicDetail', ['info'=>$info]));
         });
