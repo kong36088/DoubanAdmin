@@ -112,14 +112,11 @@ class GroupStarController extends Controller
             });
 
             $grid->filter(function ($filter) {
-                //$filter->like('URL', '模糊匹配url');
                 //$filter->disableIdFilter();
-
-                // 在这里添加字段过滤器
 
                 $filter->where(function ($query) {
                     if (empty($_GET['title_1']) && empty($_GET['title_2']) && empty($_GET['title_3'])) {
-                        $query->whereRaw('title', 'like', "%{$this->input}%");
+                        $query->where('title', 'like', "%{$this->input}%");
                     } else {
                         if (!empty($_GET['title_1'])) {
                             $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_1']}%')");
@@ -130,6 +127,9 @@ class GroupStarController extends Controller
                         if (!empty($_GET['title_3'])) {
                             $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_3']}%')");
                         }
+                    }
+                    if(!empty($_GET['not_title'])){
+                        $query->where('title','not like',"%{$_GET['not_title']}%");
                     }
 
                 }, '标题主关键词', 'title');
@@ -142,6 +142,11 @@ class GroupStarController extends Controller
                 }, '标题副关键字2', 'title_2');
                 $filter->where(function ($query) {
                 }, '标题副关键字3', 'title_3');
+                $filter->where(function ($query) {
+                    if(empty($_GET['title'])){
+                        $query->where('title','not like',"%{$_GET['not_title']}%");
+                    }
+                }, '反选关键字', 'not_title');
 
                 $filter->equal('group_id', '小组_id');
 

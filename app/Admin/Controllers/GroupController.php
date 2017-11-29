@@ -141,7 +141,7 @@ class GroupController extends Controller
 
                 $filter->where(function ($query) {
                     if (empty($_GET['title_1']) && empty($_GET['title_2']) && empty($_GET['title_3'])) {
-                        $query->whereRaw('title', 'like', "%{$this->input}%");
+                        $query->where('title', 'like', "%{$this->input}%");
                     } else {
                         if (!empty($_GET['title_1'])) {
                             $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_1']}%')");
@@ -152,6 +152,9 @@ class GroupController extends Controller
                         if (!empty($_GET['title_3'])) {
                             $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_3']}%')");
                         }
+                    }
+                    if(!empty($_GET['not_title'])){
+                        $query->where('title','not like',"%{$_GET['not_title']}%");
                     }
 
                 }, '标题主关键词', 'title');
@@ -164,6 +167,11 @@ class GroupController extends Controller
                 }, '标题副关键字2', 'title_2');
                 $filter->where(function ($query) {
                 }, '标题副关键字3', 'title_3');
+                $filter->where(function ($query) {
+                    if(empty($_GET['title'])){
+                        $query->where('title','not like',"%{$_GET['not_title']}%");
+                    }
+                }, '反选关键字', 'not_title');
 
                 $filter->equal('group_id', '小组_id');
 
