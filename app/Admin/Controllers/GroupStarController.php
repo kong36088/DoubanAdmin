@@ -26,8 +26,8 @@ class GroupStarController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('豆瓣租房信息');
-            $content->description('定时更新');
+            $content->header('我的收藏');
+            $content->description('');
 
             $content->body($this->grid());
         });
@@ -82,7 +82,7 @@ class GroupStarController extends Controller
 
             $grid->column('title', '标题');
 
-            $grid->update_time('最后回复时间')->sortable();
+            $grid->last_reply_time('最后回复时间')->sortable();
             $grid->reply_num('回复数量')->sortable();
             $grid->create_time('抓取时间')->sortable();
             $grid->group_id('小组名称')->sortable();
