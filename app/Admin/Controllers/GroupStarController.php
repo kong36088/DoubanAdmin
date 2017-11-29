@@ -27,7 +27,7 @@ class GroupStarController extends Controller
         return Admin::content(function (Content $content) {
 
             $content->header('我的收藏');
-            $content->description('');
+            $content->description('收藏的帖子');
 
             $content->body($this->grid());
         });
@@ -104,12 +104,33 @@ class GroupStarController extends Controller
 
                 // 在这里添加字段过滤器
 
-                $filter->like('title', '标题关键词1');
+                $filter->where(function ($query) {
+                    if(empty($_GET['title_1'])&&empty($_GET['title_2'])&&empty($_GET['title_3'])){
+                        $query->whereRaw('title','like',"%{$this->input}%");
+                    }else {
+                        if (!empty($_GET['title_1'])) {
+                            $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_1']}%')");
+                        }
+                        if (!empty($_GET['title_2'])) {
+                            $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_2']}%')");
+                        }
+                        if (!empty($_GET['title_3'])) {
+                            $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_3']}%')");
+                        }
+                    }
+
+                }, '标题主关键词', 'title');
 
 
                 $filter->where(function ($query) {
-                    $query->where('title', 'like', "%{$this->input}%");
-                }, '标题关键词2');
+                }, '标题副关键字1', 'title_1');
+
+                $filter->where(function ($query) {
+                }, '标题副关键字2', 'title_2');
+                $filter->where(function ($query) {
+                }, '标题副关键字3', 'title_3');
+
+                $filter->equal('group_id', '小组_id');
 
             });
 

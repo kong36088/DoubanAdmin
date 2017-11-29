@@ -27,8 +27,8 @@ class GroupController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('我的收藏');
-            $content->description('收藏的帖子');
+            $content->header('豆瓣帖子');
+            $content->description('租房神器');
 
             $content->body($this->grid());
         });
@@ -43,15 +43,14 @@ class GroupController extends Controller
             $info = Group::where('url', $url)->first();
 
             $content->header('帖子内容');
-            if(empty($info)){
+            if (empty($info)) {
                 return;
             }
 
             $content->description('正在查看豆瓣帖子，标题：' . $info->title);
 
 
-
-            $content->body(view('GroupTopicDetail', ['info'=>$info]));
+            $content->body(view('GroupTopicDetail', ['info' => $info]));
         });
     }
 
@@ -98,8 +97,9 @@ class GroupController extends Controller
         return Admin::grid(Group::class, function (Grid $grid) {
             $grid->model()->where('dislike', '!=', 1)->orderBy('last_reply_time', 'desc');
 
-            $grid->column('url','#')->display(function ($url) {
+            $grid->column('url', '#')->display(function ($url) {
                 $url = urlencode($url);
+                //TODO 已查看标记 标记分离
                 return "<a href=/douban/detail?url={$url}><i class='fa fa-desktop'></i>查看</a>";
             });
 
@@ -126,12 +126,33 @@ class GroupController extends Controller
 
                 // 在这里添加字段过滤器
 
-                $filter->like('title', '标题关键词1');
+                $filter->where(function ($query) {
+                    if(empty($_GET['title_1'])&&empty($_GET['title_2'])&&empty($_GET['title_3'])){
+                        $query->whereRaw('title','like',"%{$this->input}%");
+                    }else {
+                        if (!empty($_GET['title_1'])) {
+                            $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_1']}%')");
+                        }
+                        if (!empty($_GET['title_2'])) {
+                            $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_2']}%')");
+                        }
+                        if (!empty($_GET['title_3'])) {
+                            $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_3']}%')");
+                        }
+                    }
+
+                }, '标题主关键词', 'title');
 
 
                 $filter->where(function ($query) {
-                    $query->where('title', 'like', "%{$this->input}%");
-                }, '标题关键词2');
+                }, '标题副关键字1', 'title_1');
+
+                $filter->where(function ($query) {
+                }, '标题副关键字2', 'title_2');
+                $filter->where(function ($query) {
+                }, '标题副关键字3', 'title_3');
+
+                $filter->equal('group_id', '小组_id');
 
             });
 
