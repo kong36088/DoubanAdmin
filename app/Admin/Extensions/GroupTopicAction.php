@@ -77,7 +77,7 @@ SCRIPT;
 
         $star = Group::where('url', $this->id)->first()->star;
         if ($star) {
-            $content = '<a class="unstar-group-topic" href="javascript:void(0);" data-url="' . $this->id . '"><i class="fa fa-star"></i>取消标记</a>';
+            $content = '<a class="unstar-group-topic" href="javascript:void(0);" data-url="' . $this->id . '"><i class="fa fa-star-o"></i>取消标记</a>';
         } else {
             $content = '<a class="star-group-topic" href="javascript:void(0);" data-url="' . $this->id . '"><i class="fa fa-star"></i>标为喜欢</a>';
         }
