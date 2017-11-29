@@ -13,7 +13,7 @@ use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 use Illuminate\Http\Request;
 
-class GroupController extends Controller
+class GroupStarController extends Controller
 {
     use ModelForm;
 
@@ -26,8 +26,8 @@ class GroupController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('我的收藏');
-            $content->description('收藏的帖子');
+            $content->header('豆瓣租房信息');
+            $content->description('定时更新');
 
             $content->body($this->grid());
         });
@@ -74,7 +74,7 @@ class GroupController extends Controller
     protected function grid()
     {
         return Admin::grid(Group::class, function (Grid $grid) {
-            $grid->model()->where('dislike', '!=', 1);
+            $grid->model()->where('dislike', '!=', 1)->where('star', '=', 1);
 
             $grid->column('#')->display(function () {
                 return "";
@@ -133,26 +133,5 @@ class GroupController extends Controller
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');
         });
-    }
-
-    protected function dislike(Request $request)
-    {
-        $url = $request->input('url');
-        if (empty($url)) {
-            return;
-        }
-        Group::where('url', $url)->update(['dislike' => 1]);
-        return response('1');
-    }
-
-    protected function star(Request $request)
-    {
-        $url = $request->input('url');
-        $star = $request->input('star', null);
-        if (empty($url) || $star === null) {
-            return;
-        }
-        Group::where('url', $url)->update(['star' => $star]);
-        return response('1');
     }
 }
