@@ -12,8 +12,7 @@ Route::group([
 
     $router->get('/', 'HomeController@index');
 
-    $router->match(['get','post'],'/douban/dislike', "GroupController@dislike");
-    $router->match(['get','post'],'/douban/star', "GroupController@star");
+    $router->match(['get','post'],'/douban/mark', "GroupController@mark");
     $router->match(['get'],'/douban/detail', "GroupController@showDetail");
 
     $router->resource('/douban', "GroupController");

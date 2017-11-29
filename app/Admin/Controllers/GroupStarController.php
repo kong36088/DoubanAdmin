@@ -5,13 +5,13 @@ namespace App\Admin\Controllers;
 use App\Admin\Extensions\GroupTopicAction;
 use App\Group;
 
+use App\GroupMark;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
-use Illuminate\Http\Request;
 
 class GroupStarController extends Controller
 {
@@ -74,11 +74,24 @@ class GroupStarController extends Controller
     protected function grid()
     {
         return Admin::grid(Group::class, function (Grid $grid) {
-            $grid->model()->where('dislike', '!=', 1)->where('star', '=', 1)->orderBy('last_reply_time', 'desc');
+            $userId = Admin::user()->id;
+            $in = GroupMark::where(['user_id'=>$userId,'type'=>'star','value'=>1])->pluck('url')->toArray();
 
-            $grid->column('url','#')->display(function ($url) {
+            $grid->model()->whereIn('url', $in)->orderBy('last_reply_time', 'desc');
+
+            $grid->column('url', '#')->display(function ($url) {
                 $url = urlencode($url);
-                return "<a href=/douban/detail?url={$url}><i class='fa fa-desktop'></i>查看</a>";
+                $userId = Admin::user()->id;
+                $type = 'read';
+                if (GroupMark::where(['url' => $url, 'user_id' => $userId, 'type' => $type])->get()->isEmpty()) {
+                    return "<a href=/douban/detail?url={$url} data-url='{$url}'
+                            class='group-topic-read-detail'>
+                            <i class='fa fa-desktop'></i>查看</a>";
+                } else {
+                    return "<a href=/douban/detail?url={$url} data-url='{$url}'
+                            class='group-topic-read-detail' style='color:dimgrey'>
+                            <i class='fa fa-desktop'></i>查看</a>";
+                }
             });
 
 
@@ -93,7 +106,7 @@ class GroupStarController extends Controller
                 $actions->disableDelete();
                 $actions->disableEdit();
                 // append一个操作
-                $actions->append(new GroupTopicAction($actions->getKey()));
+                $actions->append(new GroupTopicAction($actions->getKey(), Admin::user()->id));
 
                 // prepend一个操作
             });
@@ -105,9 +118,9 @@ class GroupStarController extends Controller
                 // 在这里添加字段过滤器
 
                 $filter->where(function ($query) {
-                    if(empty($_GET['title_1'])&&empty($_GET['title_2'])&&empty($_GET['title_3'])){
-                        $query->whereRaw('title','like',"%{$this->input}%");
-                    }else {
+                    if (empty($_GET['title_1']) && empty($_GET['title_2']) && empty($_GET['title_3'])) {
+                        $query->whereRaw('title', 'like', "%{$this->input}%");
+                    } else {
                         if (!empty($_GET['title_1'])) {
                             $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_1']}%')");
                         }

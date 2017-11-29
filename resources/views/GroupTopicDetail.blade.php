@@ -5,7 +5,7 @@
     <a class="btn btn-sm btn-primary grid-refresh" onclick="history.back()">
         <i class="fa fa-backward"></i> 返回
     </a>
-    @if ($info->star != 1)
+    @if ($status['star'] != 1)
         <a class="star-group-topic" href="javascript:void(0);" data-url="{{$info->url}}"><i class="fa fa-star"></i>标为喜欢</a>
     @else
         <a class="unstar-group-topic" href="javascript:void(0);" data-url="{{$info->url}}"><i class="fa fa-star-o"></i>取消标记</a>
@@ -22,15 +22,15 @@
     }
 
     $('.dislike-group-topic').on('click', function () {
-        if(confirm('是否要忽略该条信息？')){
+        if (confirm('是否要忽略该条信息？')) {
             // Your code.
             var url = encodeURIComponent($(this).data('url'));
 
-            $.get('/douban/dislike?url='+url,function(result){
-                if(result == '1'){
+            $.get('/douban/mark?value=1&type=dislike&url=' + url, function (result) {
+                if (result == '1') {
                     toastr.success('操作成功！');
                     history.back();
-                }else{
+                } else {
                     toastr.error('操作失败');
                 }
             });
@@ -42,12 +42,12 @@
         // Your code.
         var url = encodeURIComponent($(this).data('url'));
 
-        $.get('/douban/star?star=1&url='+url,function(result){
-            if(result == '1'){
+        $.get('/douban/mark?value=1&type=star&url=' + url, function (result) {
+            if (result == '1') {
                 //alert('标记成功！');
                 toastr.success('操作成功！');
-                refresh();
-            }else{
+                $.pjax.reload('#pjax-container');
+            } else {
                 toastr.error('操作失败');
             }
 
@@ -59,12 +59,12 @@
         // Your code.
         var url = encodeURIComponent($(this).data('url'));
 
-        $.get('/douban/star?star=0&url='+url,function(result){
-            if(result == '1'){
+        $.get('/douban/mark?value=0&type=star&url=' + url, function (result) {
+            if (result == '1') {
                 //alert('标记成功！');
                 toastr.success('操作成功！');
-                refresh();
-            }else{
+                $.pjax.reload('#pjax-container');
+            } else {
                 toastr.error('操作失败');
             }
 

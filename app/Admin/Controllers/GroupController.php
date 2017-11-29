@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Admin\Extensions\GroupTopicAction;
 use App\Group;
 
+use App\GroupMark;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -41,6 +42,10 @@ class GroupController extends Controller
 
             /** @var Collection $info */
             $info = Group::where('url', $url)->first();
+            $star = GroupMark::where(['url' => $url, 'user_id' => Admin::user()->id, 'type' => 'star'])->pluck('value')->toArray();
+            $dislike = GroupMark::where(['url' => $url, 'user_id' => Admin::user()->id, 'type' => 'dislike'])->pluck('value')->toArray();
+            $status['star'] = empty($star) || $star[0] == 0 ? 0 : 1;
+            $status['dislike'] = empty($dislike) || $dislike[0] == 0 ? 0 : 1;
 
             $content->header('帖子内容');
             if (empty($info)) {
@@ -50,7 +55,7 @@ class GroupController extends Controller
             $content->description('正在查看豆瓣帖子，标题：' . $info->title);
 
 
-            $content->body(view('GroupTopicDetail', ['info' => $info]));
+            $content->body(view('GroupTopicDetail', ['info' => $info, 'status' => $status]));
         });
     }
 
@@ -95,12 +100,23 @@ class GroupController extends Controller
     protected function grid()
     {
         return Admin::grid(Group::class, function (Grid $grid) {
-            $grid->model()->where('dislike', '!=', 1)->orderBy('last_reply_time', 'desc');
+            $userId = Admin::user()->id;
+            $notIN = GroupMark::where(['user_id' => $userId, 'type' => 'dislike', 'value' => 1])->pluck('url')->toArray();
 
-            $grid->column('url', '#')->display(function ($url) {
+            $grid->model()->whereNotIn('url', $notIN)->orderBy('last_reply_time', 'desc');
+
+            $grid->column('url', '#')->display(function ($url) use ($userId) {
                 $url = urlencode($url);
-                //TODO 已查看标记 标记分离
-                return "<a href=/douban/detail?url={$url}><i class='fa fa-desktop'></i>查看</a>";
+                $type = 'read';
+                if (GroupMark::where(['url' => $url, 'user_id' => $userId, 'type' => $type])->get()->isEmpty()) {
+                    return "<a href=/douban/detail?url={$url} data-url='{$url}'
+                            class='group-topic-read-detail'>
+                            <i class='fa fa-desktop'></i>查看</a>";
+                } else {
+                    return "<a href=/douban/detail?url={$url} data-url='{$url}'
+                            class='group-topic-read-detail' style='color:dimgrey'>
+                            <i class='fa fa-desktop'></i>查看</a>";
+                }
             });
 
 
@@ -115,21 +131,18 @@ class GroupController extends Controller
                 $actions->disableDelete();
                 $actions->disableEdit();
                 // append一个操作
-                $actions->append(new GroupTopicAction($actions->getKey()));
+                $actions->append(new GroupTopicAction($actions->getKey(), Admin::user()->id));
 
                 // prepend一个操作
             });
 
             $grid->filter(function ($filter) {
-                //$filter->like('URL', '模糊匹配url');
                 //$filter->disableIdFilter();
 
-                // 在这里添加字段过滤器
-
                 $filter->where(function ($query) {
-                    if(empty($_GET['title_1'])&&empty($_GET['title_2'])&&empty($_GET['title_3'])){
-                        $query->whereRaw('title','like',"%{$this->input}%");
-                    }else {
+                    if (empty($_GET['title_1']) && empty($_GET['title_2']) && empty($_GET['title_3'])) {
+                        $query->whereRaw('title', 'like', "%{$this->input}%");
+                    } else {
                         if (!empty($_GET['title_1'])) {
                             $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_1']}%')");
                         }
@@ -169,7 +182,8 @@ class GroupController extends Controller
      *
      * @return Form
      */
-    protected function form()
+    protected
+    function form()
     {
         return Admin::form(Group::class, function (Form $form) {
 
@@ -180,7 +194,8 @@ class GroupController extends Controller
         });
     }
 
-    protected function dislike(Request $request)
+    protected
+    function dislike(Request $request)
     {
         $url = $request->input('url');
         if (empty($url)) {
@@ -190,7 +205,8 @@ class GroupController extends Controller
         return response('1');
     }
 
-    protected function star(Request $request)
+    protected
+    function star(Request $request)
     {
         $url = $request->input('url');
         $star = $request->input('star', null);
@@ -198,6 +214,24 @@ class GroupController extends Controller
             return;
         }
         Group::where('url', $url)->update(['star' => $star]);
+        return response('1');
+    }
+
+    protected
+    function mark(Request $request)
+    {
+        $url = $request->input('url');
+        $userId = Admin::user()->id;
+        $type = $request->input('type');
+        $value = $request->input('value', null);
+        if (empty($url) || $value === null || empty($type)) {
+            return;
+        }
+        if (GroupMark::where(['url' => $url, 'user_id' => $userId, 'type' => $type])->get()->isEmpty()) {
+            GroupMark::insert(['url' => $url, 'user_id' => $userId, 'type' => $type, 'value' => $value]);
+        } else {
+            GroupMark::where(['url' => $url, 'user_id' => $userId, 'type' => $type])->update(['value' => $value]);
+        }
         return response('1');
     }
 }
