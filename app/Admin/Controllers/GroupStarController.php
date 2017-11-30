@@ -128,9 +128,6 @@ class GroupStarController extends Controller
                             $query->orWhereRaw("(title like '%{$this->input}%' and title like '%{$_GET['title_3']}%')");
                         }
                     }
-                    if(!empty($_GET['not_title'])){
-                        $query->where('title','not like',"%{$_GET['not_title']}%");
-                    }
 
                 }, '标题主关键词', 'title');
 
@@ -143,10 +140,13 @@ class GroupStarController extends Controller
                 $filter->where(function ($query) {
                 }, '标题副关键字3', 'title_3');
                 $filter->where(function ($query) {
-                    if(empty($_GET['title'])){
-                        $query->where('title','not like',"%{$_GET['not_title']}%");
-                    }
-                }, '反选关键字', 'not_title');
+                    $query->where('title','not like',"%{$_GET['not_title1']}%");
+
+                }, '反选关键字1', 'not_title1');
+                $filter->where(function ($query) {
+                    $query->where('title','not like',"%{$_GET['not_title2']}%");
+
+                }, '反选关键字2', 'not_title2');
 
                 $filter->equal('group_id', '小组_id');
 

@@ -20,7 +20,7 @@ class GroupTopicAction
     protected function script()
     {
         return <<<SCRIPT
-$('.dislike-group-topic').on('click', function () {
+$('.dislike-group-topic').off("click").on('click', function () {
     if(confirm('是否要忽略该条信息？')){
         // Your code.
         var url = encodeURIComponent($(this).data('url'));
@@ -37,7 +37,7 @@ $('.dislike-group-topic').on('click', function () {
     
 });
 
-$('.star-group-topic').on('click', function () {
+$('.star-group-topic').off("click").on('click', function () {
     // Your code.
     var url = encodeURIComponent($(this).data('url'));    
     
@@ -54,7 +54,7 @@ $('.star-group-topic').on('click', function () {
     
 });
 
-$('.unstar-group-topic').on('click', function () {
+$('.unstar-group-topic').off("click").on('click', function () {
     // Your code.
     var url = encodeURIComponent($(this).data('url'));    
     
@@ -71,7 +71,7 @@ $('.unstar-group-topic').on('click', function () {
     
 });
 
-$('.group-topic-read-detail').on('click', function () {
+$('.group-topic-read-detail').off("click").on('click', function () {
     // Your code.
     var url = encodeURIComponent($(this).data('url'));    
     
