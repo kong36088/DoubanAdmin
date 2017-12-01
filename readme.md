@@ -33,7 +33,7 @@ php artisan key:generate
 ## 截图
 
 ![图1](http://www.jwlchina.cn/uploads/Douban/DoubanAdmin1.png)
-![图2](http://www.jwlchina.cn/uploads/Douban/DoubanAdmin1.png)
+![图2](http://www.jwlchina.cn/uploads/Douban/DoubanAdmin2.png)
 
 
 ## 租房信息爬虫（配合使用）
