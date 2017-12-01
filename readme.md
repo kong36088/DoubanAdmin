@@ -21,3 +21,20 @@ php artisan key:generate
 
 导入`sql/init.sql`文件到MYSQL数据库
 
+## 体验
+地址：http://douban.jwlchina.cn/douban
+
+
+帐号：`test`
+
+密码：`test`
+
+
+## 截图
+
+![图1](http://www.jwlchina.cn/uploads/Douban/DoubanAdmin1.png)
+![图2](http://www.jwlchina.cn/uploads/Douban/DoubanAdmin1.png)
+
+
+## 租房信息爬虫（配合使用）
+[DoubanGroupSpider](https://github.com/kong36088/DoubanGroupSpider)
