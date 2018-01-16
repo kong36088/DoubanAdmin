@@ -24,8 +24,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+
+        $schedule->command('douban:clean')->dailyAt('02:00')->description('清理过期的豆瓣租房信息（10天以前的信息）');
     }
 
     /**

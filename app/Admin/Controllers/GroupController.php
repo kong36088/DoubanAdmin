@@ -106,14 +106,15 @@ class GroupController extends Controller
             $grid->model()->whereNotIn('url', $notIN)->orderBy('last_reply_time', 'desc');
 
             $grid->column('url', '#')->display(function ($url) use ($userId) {
-                $url = urlencode($url);
+                $url = urldecode($url);
+                $urlen = urlencode($url);
                 $type = 'read';
                 if (GroupMark::where(['url' => $url, 'user_id' => $userId, 'type' => $type])->get()->isEmpty()) {
-                    return "<a href=/douban/detail?url={$url} data-url='{$url}'
+                    return "<a href=/douban/detail?url={$urlen} data-url='{$urlen}'
                             class='group-topic-read-detail'>
                             <i class='fa fa-desktop'></i>查看</a>";
                 } else {
-                    return "<a href=/douban/detail?url={$url} data-url='{$url}'
+                    return "<a href=/douban/detail?url={$urlen} data-url='{$urlen}'
                             class='group-topic-read-detail' style='color:dimgrey'>
                             <i class='fa fa-desktop'></i>查看</a>";
                 }
@@ -136,6 +137,8 @@ class GroupController extends Controller
                 // prepend一个操作
             });
 
+            // TODO 搜索记录
+            // TODO 搜索记录定时清理
             $grid->filter(function ($filter) {
                 //$filter->disableIdFilter();
 
@@ -165,10 +168,10 @@ class GroupController extends Controller
                 $filter->where(function ($query) {
                 }, '标题副关键字3', 'title_3');
                 $filter->where(function ($query) {
-                    $query->where('title','not like',"%{$_GET['not_title1']}%");
+                    $query->where('title', 'not like', "%{$_GET['not_title1']}%");
                 }, '反选关键字1', 'not_title1');
                 $filter->where(function ($query) {
-                    $query->where('title','not like',"%{$_GET['not_title2']}%");
+                    $query->where('title', 'not like', "%{$_GET['not_title2']}%");
                 }, '反选关键字2', 'not_title2');
 
                 $filter->equal('group_id', '小组_id');
@@ -188,8 +191,7 @@ class GroupController extends Controller
      *
      * @return Form
      */
-    protected
-    function form()
+    protected function form()
     {
         return Admin::form(Group::class, function (Form $form) {
 
@@ -200,10 +202,9 @@ class GroupController extends Controller
         });
     }
 
-    protected
-    function dislike(Request $request)
+    protected function dislike(Request $request)
     {
-        $url = $request->input('url');
+        $url = urldecode($request->input('url'));
         if (empty($url)) {
             return;
         }
@@ -211,10 +212,9 @@ class GroupController extends Controller
         return response('1');
     }
 
-    protected
-    function star(Request $request)
+    protected function star(Request $request)
     {
-        $url = $request->input('url');
+        $url = urldecode($request->input('url'));
         $star = $request->input('star', null);
         if (empty($url) || $star === null) {
             return;
@@ -223,10 +223,9 @@ class GroupController extends Controller
         return response('1');
     }
 
-    protected
-    function mark(Request $request)
+    protected function mark(Request $request)
     {
-        $url = $request->input('url');
+        $url = urldecode($request->input('url'));
         $userId = Admin::user()->id;
         $type = $request->input('type');
         $value = $request->input('value', null);

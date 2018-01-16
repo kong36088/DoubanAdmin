@@ -80,15 +80,16 @@ class GroupStarController extends Controller
             $grid->model()->whereIn('url', $in)->orderBy('last_reply_time', 'desc');
 
             $grid->column('url', '#')->display(function ($url) {
-                $url = urlencode($url);
+                $url = urldecode($url);
+                $urlen = urlencode($url);
                 $userId = Admin::user()->id;
                 $type = 'read';
                 if (GroupMark::where(['url' => $url, 'user_id' => $userId, 'type' => $type])->get()->isEmpty()) {
-                    return "<a href=/douban/detail?url={$url} data-url='{$url}'
+                    return "<a href=/douban/detail?url={$urlen} data-url='{$urlen}'
                             class='group-topic-read-detail'>
                             <i class='fa fa-desktop'></i>查看</a>";
                 } else {
-                    return "<a href=/douban/detail?url={$url} data-url='{$url}'
+                    return "<a href=/douban/detail?url={$urlen} data-url='{$urlen}'
                             class='group-topic-read-detail' style='color:dimgrey'>
                             <i class='fa fa-desktop'></i>查看</a>";
                 }

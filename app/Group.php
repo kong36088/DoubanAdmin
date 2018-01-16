@@ -10,4 +10,9 @@ class Group extends Model
     protected $primaryKey = 'url';
     protected $keyType = 'string';
     const CREATED_AT = 'create_time';
+
+    public function groupMark()
+    {
+        return $this->hasMany('App\GroupMark', 'url', 'url');
+    }
 }
