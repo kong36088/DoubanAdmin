@@ -20,6 +20,9 @@ class GroupTopicAction
     protected function script()
     {
         return <<<SCRIPT
+
+        
+        
 $('.dislike-group-topic').off("click").on('click', function () {
     if(confirm('是否要忽略该条信息？')){
         // Your code.
@@ -80,9 +83,9 @@ $('.group-topic-read-detail').off("click").on('click', function () {
             //alert('标记成功！');
         }else{
         }
-
     });
     
+    $.pjax({url:'/douban/detail?url='+url,container: '#pjax-container'})
 });
 
 SCRIPT;

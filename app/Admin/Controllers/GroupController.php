@@ -38,7 +38,7 @@ class GroupController extends Controller
     public function showDetail(Request $request)
     {
         return Admin::content(function (Content $content) use ($request) {
-            $url = $request->input('url');
+            $url = urldecode($request->input('url'));
 
             /** @var Collection $info */
             $info = Group::where('url', $url)->first();
@@ -110,11 +110,11 @@ class GroupController extends Controller
                 $urlen = urlencode($url);
                 $type = 'read';
                 if (GroupMark::where(['url' => $url, 'user_id' => $userId, 'type' => $type])->get()->isEmpty()) {
-                    return "<a href=/douban/detail?url={$urlen} data-url='{$urlen}'
+                    return "<a data-url='{$urlen}' href='javascript:void(0);'
                             class='group-topic-read-detail'>
                             <i class='fa fa-desktop'></i>查看</a>";
                 } else {
-                    return "<a href=/douban/detail?url={$urlen} data-url='{$urlen}'
+                    return "<a data-url='{$urlen}' href='javascript:void(0);'
                             class='group-topic-read-detail' style='color:dimgrey'>
                             <i class='fa fa-desktop'></i>查看</a>";
                 }

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Group;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class CleanGroupData extends Command
 {
@@ -49,10 +50,14 @@ class CleanGroupData extends Command
 
         $result = Group::where("updated_at", '<=', date("Y-m-d H:i:s", strtotime("-10 days")))->delete();
         if ($result || $result === 0) {
-            echo date("Y-m-d H:i:s") . " Clean group data finished" . PHP_EOL;
+            $msg = date("Y-m-d H:i:s") . " Clean group data finished";
+            echo $msg . PHP_EOL;
+            Log::info($msg);
             return true;
         } else {
-            echo date("Y-m-d H:i:s") . " Clean group data failed" . PHP_EOL;
+            $msg = date("Y-m-d H:i:s") . " Clean group data failed" . PHP_EOL;
+            echo $msg . PHP_EOL;
+            Log::info($msg);
             return false;
         }
     }

@@ -1,10 +1,10 @@
 <div style="margin-bottom: 10px;">
-    <a class="btn btn-sm btn-primary grid-refresh" onclick="refresh()">
+    <button class="btn btn-sm btn-primary grid-refresh" onclick="refresh()">
         <i class="fa fa-refresh"></i> 刷新
-    </a>
-    <a class="btn btn-sm btn-primary grid-refresh" onclick="history.back()">
+    </button>
+    <button class="btn btn-sm btn-primary grid-refresh" onclick="back()">
         <i class="fa fa-backward"></i> 返回
-    </a>
+    </button>
     @if ($status['star'] != 1)
         <a class="star-group-topic" href="javascript:void(0);" data-url="{{$info->url}}"><i class="fa fa-star"></i>标为喜欢</a>
     @else
@@ -19,6 +19,10 @@
 <script type="application/javascript">
     function refresh() {
         $.pjax.reload('#pjax-container');
+    }
+
+    function back(){
+        history.back();
     }
 
     $('.dislike-group-topic').on('click', function () {
