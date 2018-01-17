@@ -13,7 +13,7 @@ class CleanGroupData extends Command
      *
      * @var string
      */
-    protected $signature = 'douban:clean';
+    protected $signature = 'douban:clean-group-data';
 
     /**
      * The console command description.
@@ -55,7 +55,7 @@ class CleanGroupData extends Command
             Log::info($msg);
             return true;
         } else {
-            $msg = date("Y-m-d H:i:s") . " Clean group data failed" . PHP_EOL;
+            $msg = date("Y-m-d H:i:s") . " Clean group data failed";
             echo $msg . PHP_EOL;
             Log::info($msg);
             return false;

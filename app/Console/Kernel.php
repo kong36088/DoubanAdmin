@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
+        'App\Console\Commands\CleanGroupData',
     ];
 
     /**
@@ -25,7 +26,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
-        $schedule->command('douban:clean')->dailyAt('02:00')->description('清理过期的豆瓣租房信息（10天以前的信息）');
+        $schedule->command('douban:clean-group-data')->dailyAt('02:00')->description('清理过期的豆瓣租房信息（10天以前的信息）');
     }
 
     /**
