@@ -6,6 +6,7 @@ use App\Admin\Extensions\GroupTopicAction;
 use App\Group;
 
 use App\GroupMark;
+use App\SearchRecord;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -102,7 +103,6 @@ class GroupController extends Controller
         return Admin::grid(Group::class, function (Grid $grid) {
             $userId = Admin::user()->id;
             $notIN = GroupMark::where(['user_id' => $userId, 'type' => 'dislike', 'value' => 1])->pluck('url')->toArray();
-
             $grid->model()->whereNotIn('url', $notIN)->orderBy('last_reply_time', 'desc');
 
             $grid->column('url', '#')->display(function ($url) use ($userId) {
@@ -139,9 +139,8 @@ class GroupController extends Controller
 
             // TODO 搜索记录
             // TODO 搜索记录定时清理
-            $grid->filter(function ($filter) {
+            $grid->filter(function ($filter) use ($userId) {
                 //$filter->disableIdFilter();
-
                 $filter->where(function ($query) {
                     if (empty($_GET['title_1']) && empty($_GET['title_2']) && empty($_GET['title_3'])) {
                         $query->where('title', 'like', "%{$this->input}%");
@@ -175,6 +174,24 @@ class GroupController extends Controller
                 }, '反选关键字2', 'not_title2');
 
                 $filter->equal('group_id', '小组_id');
+
+                $recordFields = ['主' => ['title'], '次' => ['title_1', 'title_2', 'title_3'], '非' => ['not_title1', 'not_title2']];
+                $search = '';
+                $searchValue = '';
+                foreach ($recordFields as $k => $f) {
+                    $search .= " {$k}:";
+                    foreach ($f as $v) {
+                        if (!empty($_GET[$v])) {
+                            $search .= "{$_GET[$v]},";
+                            $searchValue .= "{$v}={$_GET[$v]}&";
+                        }
+                    }
+                    $search = rtrim($search, ',');
+                    $searchValue = rtrim($searchValue, '&');
+                }
+                if (!empty($search) && !empty($searchValue)) {
+                    SearchRecord::insert(['search' => $search, 'value' => $searchValue, 'user_id' => $userId]);
+                }
 
             });
 

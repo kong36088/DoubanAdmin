@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         //
         'App\Console\Commands\CleanGroupData',
+        'App\Console\Commands\CleanSearchRecord'
     ];
 
     /**
@@ -27,6 +28,8 @@ class Kernel extends ConsoleKernel
     {
 
         $schedule->command('douban:clean-group-data')->dailyAt('02:00')->description('清理过期的豆瓣租房信息（10天以前的信息）');
+
+        $schedule->command('douban:clean-search-record')->dailyAt('02:00')->description('清理所有用户的搜索历史（10天前）');
     }
 
     /**
