@@ -15,11 +15,14 @@ class CreateSearchRecordTable extends Migration
     public function up()
     {
         Schema::create('search_record', function (Blueprint $table) {
-            $table->string('search', 250);
+            $table->string('primary', 250)->nullable();
+            $table->string('secondary', 250)->nullable();
+            $table->string('not', 250)->nullable();
             $table->integer('user_id');
-            $table->string('value', 250);
+            $table->string('value', 250)->nullable();
             $table->timestamp("create_time")->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->primary(['search', 'user_id']);
+            $table->index(['primary', 'secondary', 'not', 'user_id']);
+            $table->index(['value', 'user_id']);
         });
     }
 

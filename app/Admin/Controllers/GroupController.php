@@ -13,8 +13,9 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class GroupController extends Controller
 {
@@ -137,8 +138,6 @@ class GroupController extends Controller
                 // prepend一个操作
             });
 
-            // TODO 搜索记录
-            // TODO 搜索记录定时清理
             $grid->filter(function ($filter) use ($userId) {
                 //$filter->disableIdFilter();
                 $filter->where(function ($query) {
@@ -175,22 +174,28 @@ class GroupController extends Controller
 
                 $filter->equal('group_id', '小组_id');
 
-                $recordFields = ['主' => ['title'], '次' => ['title_1', 'title_2', 'title_3'], '非' => ['not_title1', 'not_title2']];
-                $search = '';
+                $recordFields = ['primary' => ['title'], 'secondary' => ['title_1', 'title_2', 'title_3'], 'not' => ['not_title1', 'not_title2']];
+                $search = [];
                 $searchValue = '';
                 foreach ($recordFields as $k => $f) {
-                    $search .= " {$k}:";
                     foreach ($f as $v) {
                         if (!empty($_GET[$v])) {
-                            $search .= "{$_GET[$v]},";
+                            if(empty($search[$k])){
+                                $search[$k] = '';
+                            }
+                            $search[$k] .= "{$_GET[$v]},";
                             $searchValue .= "{$v}={$_GET[$v]}&";
                         }
                     }
-                    $search = rtrim($search, ',');
-                    $searchValue = rtrim($searchValue, '&');
+                    if(isset($search[$k])){
+                        $search[$k] = rtrim($search[$k], ',');
+                    }
                 }
-                if (!empty($search) && !empty($searchValue)) {
-                    SearchRecord::insert(['search' => $search, 'value' => $searchValue, 'user_id' => $userId]);
+                $searchValue = rtrim($searchValue, '&');
+                $search['user_id'] = $userId;
+                $search['value'] = $searchValue;
+                if (!empty($searchValue)) {
+                    SearchRecord::insert($search);
                 }
 
             });
@@ -199,6 +204,19 @@ class GroupController extends Controller
 
             $grid->disableCreation();
             $grid->disableRowSelector();
+
+            //顶部工具
+            $grid->tools(function ($tools) use ($userId) {
+                /** @var Collection $records 查询top3搜索历史 */
+                $records = SearchRecord::where('user_id', $userId)->select(DB::raw('count(1) as num,user_id,value'))
+                    ->groupBy('user_id', 'value')->orderBy('num', 'desc')->limit(3)->get();
+                $top3 = array();
+                foreach($records as $r){
+                    $top3[] = SearchRecord::where('user_id',$r->user_id)->where('value',$r->value)
+                        ->first()->toArray();
+                }
+                $tools->append(new \App\Admin\Extensions\Tools\SearchRecord($top3));
+            });
 
         });
     }
