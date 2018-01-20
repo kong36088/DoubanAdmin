@@ -122,7 +122,20 @@ class GroupController extends Controller
             });
 
 
-            $grid->column('title', '标题');
+            $grid->column('title', '标题')->display(function ($title) use ($userId) {
+                $url = urldecode($this->url);
+                $urlen = urlencode($url);
+                $type = 'read';
+                if (GroupMark::where(['url' => $url, 'user_id' => $userId, 'type' => $type])->get()->isEmpty()) {
+                    return "<a data-url='{$urlen}' href='javascript:void(0);'
+                            class='group-topic-read-detail'>
+                            {$title}</a>";
+                } else {
+                    return "<a data-url='{$urlen}' href='javascript:void(0);'
+                            class='group-topic-read-detail' style='color:dimgrey'>
+                            {$title}</a>";
+                }
+            });
 
             $grid->last_reply_time('最后回复时间')->sortable();
             $grid->reply_num('回复数量')->sortable();
@@ -180,14 +193,14 @@ class GroupController extends Controller
                 foreach ($recordFields as $k => $f) {
                     foreach ($f as $v) {
                         if (!empty($_GET[$v])) {
-                            if(empty($search[$k])){
+                            if (empty($search[$k])) {
                                 $search[$k] = '';
                             }
                             $search[$k] .= "{$_GET[$v]},";
                             $searchValue .= "{$v}={$_GET[$v]}&";
                         }
                     }
-                    if(isset($search[$k])){
+                    if (isset($search[$k])) {
                         $search[$k] = rtrim($search[$k], ',');
                     }
                 }
@@ -211,8 +224,8 @@ class GroupController extends Controller
                 $records = SearchRecord::where('user_id', $userId)->select(DB::raw('count(1) as num,user_id,value'))
                     ->groupBy('user_id', 'value')->orderBy('num', 'desc')->limit(3)->get();
                 $top3 = array();
-                foreach($records as $r){
-                    $top3[] = SearchRecord::where('user_id',$r->user_id)->where('value',$r->value)
+                foreach ($records as $r) {
+                    $top3[] = SearchRecord::where('user_id', $r->user_id)->where('value', $r->value)
                         ->first()->toArray();
                 }
                 $tools->append(new \App\Admin\Extensions\Tools\SearchRecord($top3));
