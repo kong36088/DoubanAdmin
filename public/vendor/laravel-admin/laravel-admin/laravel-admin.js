@@ -53,6 +53,9 @@ $(document).on('pjax:complete', function(xhr) {
         }
     }
     NProgress.done();
+
+    //去除遮蔽层
+    $(".modal-backdrop.fade.in").remove();
 });
 
 $(function(){
