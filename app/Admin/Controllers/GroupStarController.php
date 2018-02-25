@@ -96,7 +96,20 @@ class GroupStarController extends Controller
             });
 
 
-            $grid->column('title', '标题');
+            $grid->column('title', '标题')->display(function ($title) use ($userId) {
+                $url = urldecode($this->url);
+                $urlen = urlencode($url);
+                $type = 'read';
+                if (GroupMark::where(['url' => $url, 'user_id' => $userId, 'type' => $type])->get()->isEmpty()) {
+                    return "<a data-url='{$urlen}' href='javascript:void(0);'
+                            class='group-topic-read-detail'>
+                            {$title}</a>";
+                } else {
+                    return "<a data-url='{$urlen}' href='javascript:void(0);'
+                            class='group-topic-read-detail' style='color:dimgrey'>
+                            {$title}</a>";
+                }
+            });
 
             $grid->last_reply_time('最后回复时间')->sortable();
             $grid->reply_num('回复数量')->sortable();
