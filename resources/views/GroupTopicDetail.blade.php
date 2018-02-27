@@ -1,4 +1,9 @@
 <div style="margin-bottom: 10px;">
+    <a href="{{urldecode($info->url)}}" target="_blank">
+        <button class="btn btn-sm btn-primary grid-refresh">
+            <i class="fa fa-refresh"></i> 查看原帖
+        </button>
+    </a>
     <button class="btn btn-sm btn-primary grid-refresh" onclick="refresh()">
         <i class="fa fa-refresh"></i> 刷新
     </button>
@@ -21,7 +26,7 @@
         $.pjax.reload('#pjax-container');
     }
 
-    function back(){
+    function back() {
         history.back();
     }
 

@@ -187,6 +187,11 @@ class GroupController extends Controller
 
                 $filter->equal('group_id', '小组_id');
 
+                $filter->where(function ($query) {
+                    $query->where('author',trim($this->input));
+                }, 'author', '发帖人');
+
+                //搜索记录
                 $recordFields = ['primary' => ['title'], 'secondary' => ['title_1', 'title_2', 'title_3'], 'not' => ['not_title1', 'not_title2']];
                 $search = [];
                 $searchValue = '';
