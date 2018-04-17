@@ -6,6 +6,8 @@
  
 `mysql`
 
+`composer`
+
 ## 安装
 
 ```bash
@@ -18,8 +20,11 @@ php artisan key:generate
 配置`.env`文件
 
 
-
 导入`sql/init.sql`文件到MYSQL数据库
+
+`nginx|apache`，将网站路径(root路径)配置到项目路径下的`public`文件夹即可。
+
+具体配置文件写法可以参考[Laravel配置](https://docs.golaravel.com/docs/5.6/installation/)
 
 ## 体验
 地址：http://douban.jwlchina.cn/douban
